@@ -50,4 +50,17 @@ class NumberIterator implements Iterator
             --$this->position;
         }
     }
+
+    /**
+     * Recule de plusieurs éléments dans l'itérateur si possible.
+     */
+    public function morePrevious(int $args): void
+    {
+        if ($this->position > 0) {
+            $this->position -= $args;
+            if ($this->position < 0) {
+                $this->position = 0;
+            }
+        }
+    }
 }

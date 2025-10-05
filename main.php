@@ -15,7 +15,7 @@ class Main {
     private CommandManager $commandManager;
 
     public function __construct() {
-        $this->data = new Data(range(1, 100000));
+        $this->data = new Data(range(1, 10));
         $this->iterator = new NumberIterator($this->data->getAll());
         $this->iteratorhelper = new NumberIteratorHelper($this->iterator);
         $this->commandManager = new CommandManager($this->iterator);

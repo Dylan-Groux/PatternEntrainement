@@ -15,27 +15,52 @@ class CommandManager
 
     public function runFindCommand(): void
     {
-        foreach ($this->iterator as $index => $value) {
-            echo "Élément " . ($index + 1) . " : " . $value . "\n";
-        }
+        while (true) {
+            echo "\n--- Menu Iterator ---\n";
+            echo "1. Afficher tous les éléments\n";
+            echo "2. Chercher un nombre\n";
+            echo "3. Revenir en arrière (previous)\n";
+            echo "4. Ajouter une valeur\n";
+            echo "5. Quitter\n";
+            $choice = readline("Votre choix : ");
 
-        echo "Entrez un nombre à rechercher dans les données : ";
-        $userInput = trim(fgets(STDIN));
-        $numberToFind = intval($userInput);
-        $found = $this->iteratorhelper->find($numberToFind);
-
-        if ($found) {
-            echo "Le nombre $numberToFind a été trouvé dans les données.\n";
-        } else {
-            echo "Le nombre $numberToFind n'a pas été trouvé dans les données.\n";
-        }
-
-        $readline = readline("Voulez-vous revenir un arrière ? ");
-        if ($readline === "oui") {
-            $this->iteratorhelper->previous();
-            echo "Le nombre courant après previous : " . $this->iterator->current() . "\n";
-        } else {
-            exit;
+            switch ($choice) {
+                case '1':
+                    foreach ($this->iterator as $index => $value) {
+                        echo "Élément " . ($index + 1) . " : " . $value . "\n";
+                    }
+                    break;
+                case '2':
+                    $numberToFind = intval(readline("Entrez un nombre à rechercher : "));
+                    $found = $this->iteratorhelper->find($numberToFind);
+                    if ($found) {
+                        echo "Le nombre $numberToFind a été trouvé. Position courante : " . $this->iterator->key() . "\n";
+                    } else {
+                        echo "Le nombre $numberToFind n'a pas été trouvé.\n";
+                    }
+                    break;
+                case '3':
+                    $userInput = readline("Combien de positions reculer ? (par défaut 1) : ");
+                    if (is_numeric($userInput) && intval($userInput) > 1) {
+                        $this->iterator->morePrevious(intval($userInput));
+                        echo "Position après morePrevious de $userInput : " . $this->iterator->key() . ", valeur : " . $this->iterator->current() . "\n";
+                    } else {
+                        $this->iteratorhelper->previous();
+                        echo "Position après previous : " . $this->iterator->key() . ", valeur : " . $this->iterator->current() . "\n";
+                    }
+                    break;
+                case '4':
+                    $value = intval(readline("Valeur à ajouter : "));
+                    // Attention : il faut ajouter la valeur à la collection d'origine (ex: Data)
+                    // Ici, il faudrait passer la Data à CommandManager ou la manipuler autrement
+                    echo "Ajout non implémenté (à faire selon ta structure Data)\n";
+                    break;
+                case '5':
+                    echo "Au revoir !\n";
+                    exit;
+                default:
+                    echo "Choix invalide.\n";
+            }
         }
     }
 }
