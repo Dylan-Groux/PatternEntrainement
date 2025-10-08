@@ -1,5 +1,5 @@
 {
-    "name": "dylangroux2105/my-cli-app",
+    "name": "dylangroux2105/my",
     "description": "Une application CLI de démonstration sans interface Iterator.",
     "type": "project",
     "require": {

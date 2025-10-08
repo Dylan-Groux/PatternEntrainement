@@ -2,18 +2,41 @@
 
 namespace App\Services;
 
+use App\Entity\Data;
+use App\Services\Strategy\BinarySearchStrategy;
+use App\Services\Strategy\LinearSearchStrategy;
+use App\Services\Strategy\SearchStrategyInterface;
+use App\Services\FormatedDataService;
+
 class CommandManager
 {
     private NumberIteratorHelper $iteratorhelper;
     private NumberIterator $iterator;
+    private Data $data;
+    private FormatedDataService $formatedData;
 
-    public function __construct(NumberIterator $iterator)
+    public function __construct(NumberIterator $iterator, Data $data)
     {
         $this->iterator = $iterator;
         $this->iteratorhelper = new NumberIteratorHelper($iterator);
+        $this->data = $data;
+        $this->formatedData = new FormatedDataService();
     }
 
-    public function runFindCommand(): void
+    public function searchNumberToFind(mixed $collection, int $numberToFind, SearchStrategyInterface $strategy): bool
+    {
+        $result = $strategy->search($collection, $numberToFind);
+
+        if ($result !== false) {
+            echo "Le nombre $numberToFind a été trouvé à l'index $result \n";
+            return true;
+        } else {
+            echo "Le nombre $numberToFind n'a pas été trouvé. \n";
+            return false;
+        }
+    }
+
+    public function runIteratorCommand(): void
     {
         while (true) {
             echo "\n--- Menu Iterator ---\n";
@@ -51,9 +74,11 @@ class CommandManager
                     break;
                 case '4':
                     $value = intval(readline("Valeur à ajouter : "));
-                    // Attention : il faut ajouter la valeur à la collection d'origine (ex: Data)
-                    // Ici, il faudrait passer la Data à CommandManager ou la manipuler autrement
-                    echo "Ajout non implémenté (à faire selon ta structure Data)\n";
+                    $this->data->add($value);
+                    // Réinstancie l'iterator pour prendre en compte la nouvelle valeur
+                    $this->iterator = new NumberIterator($this->data->getAll());
+                    $this->iteratorhelper = new NumberIteratorHelper($this->iterator);
+                    echo "Valeur ajoutée !\n";
                     break;
                 case '5':
                     echo "Au revoir !\n";
@@ -61,6 +86,44 @@ class CommandManager
                 default:
                     echo "Choix invalide.\n";
             }
+        }
+    }
+
+    public function runStrategyCommand(): void 
+    {
+        while(true) 
+        {
+            echo "\n--- Menu Strategy ---\n";
+            echo "1. Parcours linéaire\n";
+            echo "2. Parcours binaire\n";
+            $choice = readline("Votre choix : ");
+
+            switch ($choice) {
+                case '1':
+                    echo "Parcours linéaire sélectionné.\n";
+                    /** @var SearchStrategyInterface $strategy */
+                    $strategy = new LinearSearchStrategy;
+                    $numberToFInd = intval(readline("Entrez un nombre à rechercher : "));
+                    $this->searchNumberToFind($this->data->getAll(), $numberToFInd, $strategy);
+                    break;
+                case '2':
+                    echo "Parcours binaire sélectionné.\n";
+                    /** @var SearchStrategyInterface $strategy */
+                    $strategy = new BinarySearchStrategy;
+                    $numberToFInd = intval(readline("Entrez un nombre à rechercher : "));
+                    $data = $this->formatedData->sortArray($this->data->getAll());
+                    foreach($data as $index => $value) {
+                        if ($data !== false) {
+                            echo "Élément " . ($index + 1) . " : " . $value . "\n";
+                        }
+                    }
+                    $this->searchNumberToFind($data, $numberToFInd, $strategy);
+                    break;
+                default:
+                    echo "Choix invalide.\n";
+                    continue 2;
+            }
+            break;
         }
     }
 }

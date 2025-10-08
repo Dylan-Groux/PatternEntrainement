@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Iterator;
-use App\Entity\Data;
 
 class NumberIterator implements Iterator
 {
